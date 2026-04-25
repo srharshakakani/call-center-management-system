@@ -25,4 +25,9 @@ public class CallController {
     public List<Call> getAll() {
         return service.getAll();
     }
+
+    @GetMapping("/queue")
+    public List<Call> getQueue() {
+        return service.getQueue();
+    }
 }
