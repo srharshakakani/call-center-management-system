@@ -6,6 +6,7 @@ public class MainUI {
 
     public static QueuePanel queuePanel;
     public static DashboardPanel dashboardPanel;
+    public static AgentPanel agentPanel;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -17,9 +18,11 @@ public class MainUI {
 
             queuePanel = new QueuePanel();
             dashboardPanel = new DashboardPanel();
+            agentPanel = new AgentPanel();
 
             tabs.add("Queue", queuePanel);
             tabs.add("New Call", new NewCallPanel());
+            tabs.add("Agents", agentPanel);
             tabs.add("Dashboard", dashboardPanel);
 
             frame.add(tabs);
@@ -27,8 +30,12 @@ public class MainUI {
         });
     }
 
+    // FIXED REFRESH METHOD
     public static void refreshAll() {
-        if (queuePanel != null) queuePanel.refresh();
-        if (dashboardPanel != null) dashboardPanel.refresh();
+        SwingUtilities.invokeLater(() -> {
+            if (queuePanel != null) queuePanel.refresh();
+            if (dashboardPanel != null) dashboardPanel.refresh();
+            if (agentPanel != null) agentPanel.refresh();
+        });
     }
 }

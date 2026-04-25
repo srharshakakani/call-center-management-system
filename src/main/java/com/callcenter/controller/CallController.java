@@ -41,7 +41,7 @@ public class CallController {
         return service.getQueue();
     }
 
-    @PatchMapping("/{id}")
+    @PostMapping("/{id}/update")
     public Call updateCall(
             @PathVariable Long id,
             @RequestParam CallStatus status,

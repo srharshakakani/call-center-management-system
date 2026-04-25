@@ -6,60 +6,41 @@ import java.net.URL;
 
 public class ApiClient {
 
+    private static final String BASE_URL = "http://localhost:8080";
+
     public static String get(String endpoint) throws Exception {
-        URL url = new URL("http://localhost:8080" + endpoint);
+        URL url = new URL(BASE_URL + endpoint);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
 
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(conn.getInputStream()));
-        String inputLine;
-        StringBuilder response = new StringBuilder();
-
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
-
-        return response.toString();
+        return readResponse(conn);
     }
 
     public static String post(String endpoint, String json) throws Exception {
-        URL url = new URL("http://localhost:8080" + endpoint);
+        URL url = new URL(BASE_URL + endpoint);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setDoOutput(true);
 
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(json.getBytes());
+        if (json != null && !json.isEmpty()) {
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(json.getBytes());
+            }
         }
 
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(conn.getInputStream()));
-        StringBuilder response = new StringBuilder();
-        String line;
-
-        while ((line = in.readLine()) != null) {
-            response.append(line);
-        }
-        in.close();
-
-        return response.toString();
+        return readResponse(conn);
     }
 
-    // PATCH METHOD
-    public static String patch(String endpoint) throws Exception {
-        URL url = new URL("http://localhost:8080" + endpoint);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    private static String readResponse(HttpURLConnection conn) throws Exception {
+        int responseCode = conn.getResponseCode();
 
-        conn.setRequestMethod("PATCH");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setDoOutput(true);
+        InputStream stream = (responseCode >= 200 && responseCode < 300)
+                ? conn.getInputStream()
+                : conn.getErrorStream();
 
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(conn.getInputStream()));
+        BufferedReader in = new BufferedReader(new InputStreamReader(stream));
 
         StringBuilder response = new StringBuilder();
         String line;

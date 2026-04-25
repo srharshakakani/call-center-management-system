@@ -18,7 +18,7 @@ public class QueuePanel extends JPanel implements Refreshable {
         table = new JTable(tableModel);
 
         JButton refreshBtn = new JButton("Refresh");
-        refreshBtn.addActionListener(e -> loadData());
+        refreshBtn.addActionListener(e -> refresh());
 
         JButton updateBtn = new JButton("Mark In Progress");
         updateBtn.addActionListener(e -> updateSelectedCall());
@@ -36,6 +36,8 @@ public class QueuePanel extends JPanel implements Refreshable {
     @Override
     public void refresh() {
         loadData();
+        table.revalidate();
+        table.repaint();
     }
 
     private void updateSelectedCall() {
@@ -46,17 +48,18 @@ public class QueuePanel extends JPanel implements Refreshable {
             return;
         }
 
-        String id = table.getValueAt(row, 0).toString();
+        String callId = table.getValueAt(row, 0).toString();
 
         try {
-            // assumes agentId = 1 exists
-            ApiClient.patch("/calls/" + id + "?status=IN_PROGRESS&agentId=1");
+            ApiClient.post("/calls/" + callId + "/update?status=IN_PROGRESS", "");
 
-            JOptionPane.showMessageDialog(this, "Call updated!");
+            JOptionPane.showMessageDialog(this, "Call assigned successfully!");
+
             MainUI.refreshAll();
 
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error updating call");
+            JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
@@ -64,7 +67,11 @@ public class QueuePanel extends JPanel implements Refreshable {
         try {
             String response = ApiClient.get("/calls/queue");
 
+            System.out.println("QUEUE RESPONSE: " + response);
+
             tableModel.setRowCount(0);
+
+            if (response.equals("[]")) return;
 
             String[] items = response.split("\\},\\{");
 
@@ -88,7 +95,11 @@ public class QueuePanel extends JPanel implements Refreshable {
         try {
             String[] parts = json.split("\"" + key + "\":");
             String value = parts[1].split(",")[0];
-            return value.replace("\"", "").replace("}", "");
+            return value
+                    .replace("\"", "")
+                    .replace("}", "")
+                    .replace("]", "")
+                    .trim();
         } catch (Exception e) {
             return "";
         }
