@@ -16,6 +16,9 @@ public class Call {
     private String callerName;
     private String phoneNumber;
 
+    @ManyToOne
+    private Agent assignedAgent;
+
     @Enumerated(EnumType.STRING)
     private CallStatus status;
 

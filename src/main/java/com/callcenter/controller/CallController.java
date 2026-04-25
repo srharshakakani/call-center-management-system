@@ -1,6 +1,7 @@
 package com.callcenter.controller;
 
 import com.callcenter.model.Call;
+import com.callcenter.model.CallStatus;
 import com.callcenter.service.CallService;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,5 +30,14 @@ public class CallController {
     @GetMapping("/queue")
     public List<Call> getQueue() {
         return service.getQueue();
+    }
+
+    @PatchMapping("/{id}")
+    public Call updateCall(
+            @PathVariable Long id,
+            @RequestParam CallStatus status,
+            @RequestParam(required = false) Long agentId) {
+
+        return service.updateCall(id, status, agentId);
     }
 }
