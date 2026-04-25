@@ -1,6 +1,7 @@
 package com.callcenter.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -13,11 +14,11 @@ public class Call {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     private String callerName;
-    private String phoneNumber;
 
-    @ManyToOne
-    private Agent assignedAgent;
+    @NotBlank
+    private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
     private CallStatus status;
@@ -26,6 +27,9 @@ public class Call {
     private Priority priority;
 
     private String notes;
+
+    @ManyToOne
+    private Agent assignedAgent;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

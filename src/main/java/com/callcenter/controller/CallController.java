@@ -1,8 +1,11 @@
 package com.callcenter.controller;
 
+import com.callcenter.dto.CallRequest;
 import com.callcenter.model.Call;
 import com.callcenter.model.CallStatus;
+import com.callcenter.model.Priority;
 import com.callcenter.service.CallService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +21,13 @@ public class CallController {
     }
 
     @PostMapping
-    public Call create(@RequestBody Call call) {
+    public Call create(@Valid @RequestBody CallRequest req) {
+        Call call = new Call();
+        call.setCallerName(req.getCallerName());
+        call.setPhoneNumber(req.getPhoneNumber());
+        call.setPriority(Priority.valueOf(req.getPriority()));
+        call.setNotes(req.getNotes());
+
         return service.create(call);
     }
 
