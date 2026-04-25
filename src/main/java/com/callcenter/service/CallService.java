@@ -1,5 +1,6 @@
 package com.callcenter.service;
 
+import com.callcenter.dto.SummaryResponse;
 import com.callcenter.model.*;
 import com.callcenter.repository.CallRepository;
 import com.callcenter.repository.AgentRepository;
@@ -19,6 +20,29 @@ public class CallService {
     public CallService(CallRepository callRepository, AgentRepository agentRepository) {
         this.callRepository = callRepository;
         this.agentRepository = agentRepository;
+    }
+
+    public SummaryResponse getSummary() {
+
+        long total = callRepository.count();
+
+        long queued = callRepository.countByStatus(CallStatus.QUEUED);
+        long inProgress = callRepository.countByStatus(CallStatus.IN_PROGRESS);
+        long resolved = callRepository.countByStatus(CallStatus.RESOLVED);
+        long escalated = callRepository.countByStatus(CallStatus.ESCALATED);
+
+        long availableAgents = agentRepository.countByStatus(AgentStatus.AVAILABLE);
+        long busyAgents = agentRepository.countByStatus(AgentStatus.BUSY);
+
+        return new SummaryResponse(
+                total,
+                queued,
+                inProgress,
+                resolved,
+                escalated,
+                availableAgents,
+                busyAgents
+        );
     }
 
     public Call create(Call call) {
